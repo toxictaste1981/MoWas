@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title></title>
+      <link rel = "stylesheet" href = "leaflet.css"/>
+      <script src = "leaflet.js"></script>
+	  <meta charset="UTF-8">
+   </head>
+   
+   <body>
+      <div id = "map" style = "width: auto; height: 90vH"></div>
+      <script>
+	  var array;
+	  var array2;
+	  var latlang=[];
+	  function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        } else {
+		console.log(file);
+		console.log(rawFile.status);
+		}
+    }
+    rawFile.send(null);
+}
+
+var currentHost ="http://"+window.location.host;
+if (window.location.search.substr(1) != ''){
+var parameterValue = decodeURIComponent(window.location.search.match(/(\?|&)item\=([^&]*)/)[2]);
+
+readTextFile(currentHost+"/rest/items/"+parameterValue+"?type=json", function(text){
+    var data = JSON.parse(text);
+	console.log(data);
+	if (data.state !=''){
+	var jsonResult = data.state;
+	// Creating latlng object
+	array = data.state.split('|');
+	
+	for (var e = 0; e < array.length; e++) {
+		array[e]=array[e].split(', ').join(',');
+		array2=array[e].split(' ');
+		latlang[e]=[];
+		for (var o = 0; o < array2.length; o++) {
+			latlang[e][o]=(array2[o].split(',')).reverse().map(Number);
+			}
+	}
+
+//readTextFile(currentHost+"/rest/services/org.eclipse.smarthome.core.i18nprovider/config", function(text2){ OH < 2.5
+readTextFile(currentHost+"/rest/services/org.eclipse.smarthome.i18n/config", function(text2){
+    var data = JSON.parse(text2);		
+	var jsonResult2 =[];
+	jsonResult2 = data.location.split(',').map(Number);
+         // Creating map options
+         var mapOptions = {
+            center: jsonResult2,
+            zoom: 13
+         }
+		 // Icon options
+		 var iconOptions = {
+		   iconUrl: 'marker.png',
+		   iconSize: [32, 53]
+		}
+
+		// Creating a custom icon
+		var customIcon = L.icon(iconOptions);
+			// Options for the marker
+		var markerOptions = {
+		   title: "MyLocation",
+		   clickable: false,
+		   draggable: false,
+		   icon: customIcon
+		}
+		 var marker = L.marker(jsonResult2, markerOptions);
+         // Creating a map object
+         var map = new L.map('map', mapOptions);
+         
+         // Creating a Layer object
+         var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+         
+         // Adding layer to the map
+         map.addLayer(layer);
+
+         // Creating multi polygon options
+         var multiPolygonOptions = {color:'red', weight:1};
+         
+         // Creating multi polygons
+         var multipolygon = L.multiPolygon(latlang , multiPolygonOptions);
+         
+         // Adding multi polygon to map
+         multipolygon.addTo(map);
+		marker.addTo(map);
+		 })}})}else {document.write("<h1>Missing file</h1>");}
+      </script>
+   </body>
+</html>

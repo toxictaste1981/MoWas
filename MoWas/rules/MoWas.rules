@@ -1,0 +1,260 @@
+//Anmerkung:
+//es wird immer nur die letzte warnung/entwarnung angezeigt
+//es wir vom DWD nur ab Stufe 2 ausgegeben leigt nicht am script liegt am bund.de
+//es wird über rest auf die in der Paper UI gespeicherte position zugegriffen
+
+import java.net.InetAddress;
+rule "test"
+when
+    Time cron "0 */30 * ? * *"  //every 30 Minutes
+then
+	var error=0;
+	var ip = InetAddress.getLocalHost();
+    var hostname = ip.getHostAddress();	
+	var currentHost ="http://"+hostname+":8080";
+// Abfrage der location 
+	//bis OH 2.4 val String locationpoint = transform("JSONPATH","$.location",sendHttpGetRequest(currentHost+"/rest/services/org.eclipse.smarthome.core.i18nprovider/config"))
+	  
+	val String locationpoint = transform("JSONPATH","$.location",sendHttpGetRequest(currentHost+"/rest/services/org.eclipse.smarthome.i18n/config"))
+	if ((locationpoint.indexOf("error")!== -1) || (locationpoint == "{}")){
+		logError("rule test","location not set");
+		println(transform("JSONPATH","$.error",locationpoint));
+		error=1;
+	}
+//Abfrage der einzelnen WarnSysteme
+//	MoWas
+	var String mowas_string = sendHttpGetRequest("https://warnung.bund.de/bbk.mowas/gefahrendurchsagen.json")
+//	BiWaPP
+	var String biwapp_string = sendHttpGetRequest("https://warnung.bund.de/bbk.biwapp/warnmeldungen.json")
+//	DWD
+	var String dwd_string = sendHttpGetRequest("https://warnung.bund.de/bbk.dwd/unwetter.json")
+//	LHP 
+	var String lhp_string = sendHttpGetRequest("https://warnung.bund.de/bbk.lhp/hochwassermeldungen.json")
+//	KatWarn
+	var String katwarn_string = sendHttpGetRequest("https://warnung.bund.de/bbk.katwarn/warnmeldungen.json")
+	
+	if (mowas_string.indexOf("<html>")!== -1){
+		logError("rule test","Mowas 404");
+		println(mowas_string);
+		error=2
+	}
+	if (biwapp_string.indexOf("<html>")!== -1){
+		logError("rule test","BIWAPP 404");
+		println(biwapp_string);
+		error=3
+	}
+	if (dwd_string.indexOf("<html>")!== -1){
+		logError("rule test","DWD 404");
+		println(dwd_string);
+		error=4
+	}
+	if (lhp_string.indexOf("<html>")!== -1){
+		logError("rule test","LHP 404");
+		println(lhp_string);
+		error=5
+	}
+		if (katwarn_string.indexOf("<html>")!== -1){
+		logError("rule test","KATWARN 404");
+		println(katwarn_string);
+		error=6
+	}
+
+//Suche nach Meldungen in den einzelnen WarnSysteme an hand der location
+	var String mowas_check = "["+mowas_string+",["+locationpoint+"]]";
+	var String mowas_result = transform("JS", "MoWas.js", mowas_check);
+	
+	var String biwapp_check = "["+biwapp_string+",["+locationpoint+"]]";
+	var String biwapp_result = transform("JS", "MoWas.js", biwapp_check);
+	
+	var String dwd_check = "["+dwd_string+",["+locationpoint+"]]";
+	var String dwd_result = transform("JS", "MoWas.js", dwd_check);
+	
+	var String lhp_check = "["+lhp_string+",["+locationpoint+"]]";
+	var String lhp_result = transform("JS", "MoWas.js", lhp_check);
+	
+	var String katwarn_check = "["+katwarn_string+",["+locationpoint+"]]";
+	var String katwarn_result = transform("JS", "MoWas.js", katwarn_check);
+	
+
+
+//Kontrolle des rückgabewertes und zuordung der items
+	if ((mowas_result != '') && (mowas_result != mowas_check)&& (error != 1) && (error != 2)) { 
+		if ((transform("JSONPATH","$.identifier",mowas_result))!=''){MoWaS_alarm.postUpdate('ON');}else{MoWaS_alarm.postUpdate('OFF');
+		logInfo("rule test","MoWas keine meldung");
+		}
+		MoWaS_identifier.postUpdate(transform("JSONPATH","$.identifier",mowas_result))
+		MoWaS_sender.postUpdate(transform("JSONPATH","$.sender",mowas_result))
+		MoWaS_sent.postUpdate(transform("JSONPATH","$.sent",mowas_result))
+		MoWaS_status.postUpdate(transform("JSONPATH","$.status",mowas_result))
+		MoWaS_msgType.postUpdate(transform("JSONPATH","$.msgType",mowas_result))
+		MoWaS_scope.postUpdate(transform("JSONPATH","$.scope",mowas_result))
+		MoWaS_code.postUpdate(transform("JSONPATH","$.code",mowas_result))
+		MoWaS_language.postUpdate(transform("JSONPATH","$.info[0].language",mowas_result))
+		MoWaS_category.postUpdate(transform("JSONPATH","$.info[0].category",mowas_result))
+		MoWaS_event.postUpdate(transform("JSONPATH","$.info[0].event",mowas_result))
+		MoWaS_responseType.postUpdate(transform("JSONPATH","$.info[0].responseType",mowas_result))
+		MoWaS_urgency.postUpdate(transform("JSONPATH","$.info[0].urgency",mowas_result))
+		MoWaS_severity.postUpdate(transform("JSONPATH","$.info[0].severity",mowas_result))
+		MoWaS_certainty.postUpdate(transform("JSONPATH","$.info[0].certainty",mowas_result))
+		MoWaS_headline.postUpdate(transform("JSONPATH","$.info[0].headline",mowas_result))
+		MoWaS_description.postUpdate(transform("JSONPATH","$.info[0].description",mowas_result))
+		MoWaS_instruction.postUpdate(transform("JSONPATH","$.info[0].instruction",mowas_result))
+		MoWaS_web.postUpdate(transform("JSONPATH","$.info[0].web",mowas_result))
+		MoWaS_contact.postUpdate(transform("JSONPATH","$.info[0].contact",mowas_result))
+		MoWaS_sender_langname.postUpdate(transform("JSONPATH","$.info[0].parameter[0].value",mowas_result))
+		MoWaS_sender_signature.postUpdate(transform("JSONPATH","$.info[0].parameter[1].value",mowas_result))
+		MoWaS_areaDesc.postUpdate(transform("JSONPATH","$.info[0].area[0].areaDesc",mowas_result))
+		MoWaS_polygon.postUpdate(transform("JSONPATH","$.info[0].area[0].polygon",mowas_result));
+		MoWaS_geocode_valueName.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].valueName",mowas_result))
+		MoWaS_geocode_value.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].value",mowas_result))
+	}
+	else {
+		MoWaS_alarm.postUpdate('OFF');
+		logError("rule test","MoWaS verarbeitungs Fehler");
+		println("MoWaS verarbeitungs Fehler");
+	}
+	if ((biwapp_result != '') && (biwapp_result != biwapp_check)&& (error != 1) && (error != 3)) { 
+		if ((transform("JSONPATH","$.identifier",biwapp_result))!=''){BiWaPP_alarm.postUpdate('ON');}else{BiWaPP_alarm.postUpdate('OFF');
+		logInfo("rule test","BiWaPP keine meldung");
+		}
+		
+		BiWaPP_identifier.postUpdate(transform("JSONPATH","$.identifier",biwapp_result))
+		BiWaPP_sender.postUpdate(transform("JSONPATH","$.sender",biwapp_result))
+		BiWaPP_sent.postUpdate(transform("JSONPATH","$.sent",biwapp_result))
+		BiWaPP_status.postUpdate(transform("JSONPATH","$.status",biwapp_result))
+		BiWaPP_msgType.postUpdate(transform("JSONPATH","$.msgType",biwapp_result))
+		BiWaPP_scope.postUpdate(transform("JSONPATH","$.scope",biwapp_result))
+		BiWaPP_code.postUpdate(transform("JSONPATH","$.code",biwapp_result))
+		BiWaPP_language.postUpdate(transform("JSONPATH","$.info[0].language",biwapp_result))
+		BiWaPP_category.postUpdate(transform("JSONPATH","$.info[0].category",biwapp_result))
+		BiWaPP_event.postUpdate(transform("JSONPATH","$.info[0].event",biwapp_result))
+		BiWaPP_responseType.postUpdate(transform("JSONPATH","$.info[0].responseType",biwapp_result))
+		BiWaPP_urgency.postUpdate(transform("JSONPATH","$.info[0].urgency",biwapp_result))
+		BiWaPP_severity.postUpdate(transform("JSONPATH","$.info[0].severity",biwapp_result))
+		BiWaPP_certainty.postUpdate(transform("JSONPATH","$.info[0].certainty",biwapp_result))
+		BiWaPP_headline.postUpdate(transform("JSONPATH","$.info[0].headline",biwapp_result))
+		BiWaPP_description.postUpdate(transform("JSONPATH","$.info[0].description",biwapp_result))
+		BiWaPP_instruction.postUpdate(transform("JSONPATH","$.info[0].instruction",biwapp_result))
+		BiWaPP_web.postUpdate(transform("JSONPATH","$.info[0].web",biwapp_result))
+		BiWaPP_contact.postUpdate(transform("JSONPATH","$.info[0].contact",biwapp_result))
+		BiWaPP_sender_langname.postUpdate(transform("JSONPATH","$.info[0].parameter[0].value",biwapp_result))
+		BiWaPP_sender_signature.postUpdate(transform("JSONPATH","$.info[0].parameter[1].value",biwapp_result))
+		BiWaPP_areaDesc.postUpdate(transform("JSONPATH","$.info[0].area[0].areaDesc",biwapp_result))
+		BiWaPP_polygon.postUpdate(transform("JSONPATH","$.info[0].area[0].polygon",biwapp_result))
+		BiWaPP_geocode_valueName.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].valueName",biwapp_result))
+		BiWaPP_geocode_value.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].value",biwapp_result))
+	}
+	else {
+		BiWaPP_alarm.postUpdate('OFF');
+		logError("rule test","BiWaPP verarbeitungs Fehler");
+		println("BiWaPP verarbeitungs Fehler");
+	}
+		if ((dwd_result != '') && (dwd_result != dwd_check)&& (error != 1) && (error != 4)) { 
+		if ((transform("JSONPATH","$.identifier",dwd_result))!=''){DWD_alarm.postUpdate('ON');}else{DWD_alarm.postUpdate('OFF');
+		logInfo("rule test","DWD keine meldung");
+		}
+		
+		DWD_identifier.postUpdate(transform("JSONPATH","$.identifier",dwd_result))
+		DWD_sender.postUpdate(transform("JSONPATH","$.sender",dwd_result))
+		DWD_sent.postUpdate(transform("JSONPATH","$.sent",dwd_result))
+		DWD_status.postUpdate(transform("JSONPATH","$.status",dwd_result))
+		DWD_msgType.postUpdate(transform("JSONPATH","$.msgType",dwd_result))
+		DWD_scope.postUpdate(transform("JSONPATH","$.scope",dwd_result))
+		DWD_code.postUpdate(transform("JSONPATH","$.code",dwd_result))
+		DWD_language.postUpdate(transform("JSONPATH","$.info[0].language",dwd_result))
+		DWD_category.postUpdate(transform("JSONPATH","$.info[0].category",dwd_result))
+		DWD_event.postUpdate(transform("JSONPATH","$.info[0].event",dwd_result))
+		DWD_responseType.postUpdate(transform("JSONPATH","$.info[0].responseType",dwd_result))
+		DWD_urgency.postUpdate(transform("JSONPATH","$.info[0].urgency",dwd_result))
+		DWD_severity.postUpdate(transform("JSONPATH","$.info[0].severity",dwd_result))
+		DWD_certainty.postUpdate(transform("JSONPATH","$.info[0].certainty",dwd_result))
+		DWD_headline.postUpdate(transform("JSONPATH","$.info[0].headline",dwd_result))
+		DWD_description.postUpdate(transform("JSONPATH","$.info[0].description",dwd_result))
+		DWD_instruction.postUpdate(transform("JSONPATH","$.info[0].instruction",dwd_result))
+		DWD_web.postUpdate(transform("JSONPATH","$.info[0].web",dwd_result))
+		DWD_contact.postUpdate(transform("JSONPATH","$.info[0].contact",dwd_result))
+		DWD_sender_langname.postUpdate(transform("JSONPATH","$.info[0].parameter[0].value",dwd_result))
+		DWD_sender_signature.postUpdate(transform("JSONPATH","$.info[0].parameter[1].value",dwd_result))
+		DWD_areaDesc.postUpdate(transform("JSONPATH","$.info[0].area[0].areaDesc",dwd_result))
+		DWD_polygon.postUpdate(transform("JSONPATH","$.info[0].area[0].polygon",dwd_result))
+		DWD_geocode_valueName.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].valueName",dwd_result))
+		DWD_geocode_value.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].value",dwd_result))
+	}
+	else {
+		DWD_alarm.postUpdate('OFF');
+		logError("rule test","DWD verarbeitungs Fehler");
+		println("DWD verarbeitungs Fehler");
+	}
+		if ((lhp_result != '') && (lhp_result != lhp_check)&& (error != 1) && (error != 5)) { 
+		if ((transform("JSONPATH","$.identifier",lhp_result))!=''){LHP_alarm.postUpdate('ON');}else{LHP_alarm.postUpdate('OFF');
+		logInfo("rule test","LHP keine meldung");
+		}
+		
+		LHP_identifier.postUpdate(transform("JSONPATH","$.identifier",lhp_result))
+		LHP_sender.postUpdate(transform("JSONPATH","$.sender",lhp_result))
+		LHP_sent.postUpdate(transform("JSONPATH","$.sent",lhp_result))
+		LHP_status.postUpdate(transform("JSONPATH","$.status",lhp_result))
+		LHP_msgType.postUpdate(transform("JSONPATH","$.msgType",lhp_result))
+		LHP_scope.postUpdate(transform("JSONPATH","$.scope",lhp_result))
+		LHP_code.postUpdate(transform("JSONPATH","$.code",lhp_result))
+		LHP_language.postUpdate(transform("JSONPATH","$.info[0].language",lhp_result))
+		LHP_category.postUpdate(transform("JSONPATH","$.info[0].category",lhp_result))
+		LHP_event.postUpdate(transform("JSONPATH","$.info[0].event",lhp_result))
+		LHP_responseType.postUpdate(transform("JSONPATH","$.info[0].responseType",lhp_result))
+		LHP_urgency.postUpdate(transform("JSONPATH","$.info[0].urgency",lhp_result))
+		LHP_severity.postUpdate(transform("JSONPATH","$.info[0].severity",lhp_result))
+		LHP_certainty.postUpdate(transform("JSONPATH","$.info[0].certainty",lhp_result))
+		LHP_headline.postUpdate(transform("JSONPATH","$.info[0].headline",lhp_result))
+		LHP_description.postUpdate(transform("JSONPATH","$.info[0].description",lhp_result))
+		LHP_instruction.postUpdate(transform("JSONPATH","$.info[0].instruction",lhp_result))
+		LHP_web.postUpdate(transform("JSONPATH","$.info[0].web",lhp_result))
+		LHP_contact.postUpdate(transform("JSONPATH","$.info[0].contact",lhp_result))
+		LHP_sender_langname.postUpdate(transform("JSONPATH","$.info[0].parameter[0].value",lhp_result))
+		LHP_sender_signature.postUpdate(transform("JSONPATH","$.info[0].parameter[1].value",lhp_result))
+		LHP_areaDesc.postUpdate(transform("JSONPATH","$.info[0].area[0].areaDesc",lhp_result))
+		LHP_polygon.postUpdate(transform("JSONPATH","$.info[0].area[0].polygon",lhp_result))
+		LHP_geocode_valueName.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].valueName",lhp_result))
+		LHP_geocode_value.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].value",lhp_result))
+	}
+	else {
+		LHP_alarm.postUpdate('OFF');
+		logError("rule test","LHP verarbeitungs Fehler");
+		println("LHP verarbeitungs Fehler");
+	}
+		if ((katwarn_result != '') && (katwarn_result != katwarn_check)&& (error != 1) && (error != 6)) { 
+		if ((transform("JSONPATH","$.identifier",katwarn_result))!=''){KatWarn_alarm.postUpdate('ON');}else{
+		logInfo("rule test","KatWarn keine meldung");
+		KatWarn_alarm.postUpdate('OFF');}
+		
+		KatWarn_identifier.postUpdate(transform("JSONPATH","$.identifier",katwarn_result))
+		KatWarn_sender.postUpdate(transform("JSONPATH","$.sender",katwarn_result))
+		KatWarn_sent.postUpdate(transform("JSONPATH","$.sent",katwarn_result))
+		KatWarn_status.postUpdate(transform("JSONPATH","$.status",katwarn_result))
+		KatWarn_msgType.postUpdate(transform("JSONPATH","$.msgType",katwarn_result))
+		KatWarn_scope.postUpdate(transform("JSONPATH","$.scope",katwarn_result))
+		KatWarn_code.postUpdate(transform("JSONPATH","$.code",katwarn_result))
+		KatWarn_language.postUpdate(transform("JSONPATH","$.info[0].language",katwarn_result))
+		KatWarn_category.postUpdate(transform("JSONPATH","$.info[0].category",katwarn_result))
+		KatWarn_event.postUpdate(transform("JSONPATH","$.info[0].event",katwarn_result))
+		KatWarn_responseType.postUpdate(transform("JSONPATH","$.info[0].responseType",katwarn_result))
+		KatWarn_urgency.postUpdate(transform("JSONPATH","$.info[0].urgency",katwarn_result))
+		KatWarn_severity.postUpdate(transform("JSONPATH","$.info[0].severity",katwarn_result))
+		KatWarn_certainty.postUpdate(transform("JSONPATH","$.info[0].certainty",katwarn_result))
+		KatWarn_headline.postUpdate(transform("JSONPATH","$.info[0].headline",katwarn_result))
+		KatWarn_description.postUpdate(transform("JSONPATH","$.info[0].description",katwarn_result))
+		KatWarn_instruction.postUpdate(transform("JSONPATH","$.info[0].instruction",katwarn_result))
+		KatWarn_web.postUpdate(transform("JSONPATH","$.info[0].web",katwarn_result))
+		KatWarn_contact.postUpdate(transform("JSONPATH","$.info[0].contact",katwarn_result))
+		KatWarn_sender_langname.postUpdate(transform("JSONPATH","$.info[0].parameter[0].value",katwarn_result))
+		KatWarn_sender_signature.postUpdate(transform("JSONPATH","$.info[0].parameter[1].value",katwarn_result))
+		KatWarn_areaDesc.postUpdate(transform("JSONPATH","$.info[0].area[0].areaDesc",katwarn_result))
+		KatWarn_polygon.postUpdate(transform("JSONPATH","$.info[0].area[0].polygon",katwarn_result))
+		KatWarn_geocode_valueName.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].valueName",katwarn_result))
+		KatWarn_geocode_value.postUpdate(transform("JSONPATH","$.info[0].area[0].geocode[0].value",katwarn_result))
+	}
+	else {
+		KatWarn_alarm.postUpdate('OFF');
+		logError("rule test","KatWarn verarbeitungs Fehler");
+		println("KatWarn verarbeitungs Fehler");
+	}
+end
