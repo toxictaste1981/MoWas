@@ -32,28 +32,25 @@
 	var position = newJSON[1].reverse();
 	var jsonResult = JSON.stringify(NULL);
 	var polygon=[];
-	var latlon=[];
-	var lonlat=[];
 	newJSON=newJSON[0];
 	for (var i = 0; i < newJSON.length; i++) {
 		for (var e = 0; e < (newJSON[i]['info'][0]['area']).length; e++) {
 			polygon=newJSON[i]['info'][0]['area'][e]['polygon'];
+			var lonlat=[];
 			for (var u = 0; u < polygon.length; u++) {
 				polygon[u]=polygon[u].split(', ').join(',');
 				lonlat=polygon[u].split(' ');
+				var latlon=[];
 				for (var o = 0; o < lonlat.length; o++) {
 					latlon[o]=(lonlat[o].split(',')).map(Number);
 				}
-				
 				if (inside(position,latlon)){
-					
 					newJSON[i] = realMerge(defaults,newJSON[i]);
 					if (Array.isArray(newJSON[i]['info'][0]['area'][e]['polygon']) == true){newJSON[i]['info'][0]['area'][0]['polygon']=((newJSON[i]['info'][0]['area'][e]['polygon'])).join('|')}
 					if ((newJSON[i]['info'][0]['headline']).indexOf('Entwarnung:')!== -1){newJSON[i]['msgType'] = 'Cancel';}
 					if (Array.isArray(newJSON[i]['code']) == true){newJSON[i]['code']=((newJSON[i]['code'])).join(', ')}
 					if (Array.isArray(newJSON[i]['info'][0]['category']) == true){newJSON[i]['info'][0]['category']=((newJSON[i]['info'][0]['category'])).join(', ')}
 					if (Array.isArray(newJSON[i]['info'][0]['responseType']) == true){newJSON[i]['info'][0]['responseType']=((newJSON[i]['info'][0]['responseType']).join(', '))}
-					
 					jsonResult = JSON.stringify(newJSON[i]);
 				} 
 			}
