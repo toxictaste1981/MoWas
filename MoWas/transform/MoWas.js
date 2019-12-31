@@ -47,6 +47,7 @@
 				if (inside(position,latlon)){
 					newJSON[i] = realMerge(defaults,newJSON[i]);
 					if (Array.isArray(newJSON[i]['info'][0]['area'][e]['polygon']) == true){newJSON[i]['info'][0]['area'][0]['polygon']=((newJSON[i]['info'][0]['area'][e]['polygon'])).join('|')}
+					newJSON[i]['info'][0]['area']=newJSON[i]['info'][0]['area'][e];
 					if ((newJSON[i]['info'][0]['headline']).indexOf('Entwarnung:')!== -1){newJSON[i]['msgType'] = 'Cancel';}
 					if (Array.isArray(newJSON[i]['code']) == true){newJSON[i]['code']=((newJSON[i]['code'])).join(', ')}
 					if (Array.isArray(newJSON[i]['info'][0]['category']) == true){newJSON[i]['info'][0]['category']=((newJSON[i]['info'][0]['category'])).join(', ')}
