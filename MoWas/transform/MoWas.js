@@ -31,9 +31,9 @@
 	var newJSON = JSON.parse(jsonString);
 	var position = newJSON[1].reverse();
 	var jsonResult = JSON.stringify(NULL);
-	var polygon=[];
 	newJSON=newJSON[0];
 	for (var i = 0; i < newJSON.length; i++) {
+		var polygon=[];
 		for (var e = 0; e < (newJSON[i]['info'][0]['area']).length; e++) {
 			polygon=newJSON[i]['info'][0]['area'][e]['polygon'];
 			var lonlat=[];
