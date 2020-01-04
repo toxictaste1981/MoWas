@@ -1,137 +1,142 @@
- sitemap MoWaS label="MoWaS" {
-Frame label="MOWAS"visibility=[MoWaS_alarm==ON] {
-        Text item=MoWaS_identifier
-        Text item=MoWaS_sender
-        Text item=MoWaS_sent
-        Text item=MoWaS_msgType
-        Text item=MoWaS_scope
-        Text item=MoWaS_code
-        Text item=MoWaS_language
-        Text item=MoWaS_category
-        Text item=MoWaS_event
-        Text item=MoWaS_responseType
-        Text item=MoWaS_urgency
-        Text item=MoWaS_severity
-        Text item=MoWaS_certainty
-        Text item=MoWaS_headline
-        Text item=MoWaS_description
-        Text item=MoWaS_instruction
-        Text item=MoWaS_web
-        Text item=MoWaS_contact
-        Text item=MoWaS_sender_langname
-        Text item=MoWaS_sender_signature
-        Text item=MoWaS_areaDesc
-		Webview url="../static/map/map.html?item=MoWaS_polygon" height=5
-		Text item=MoWaS_geocode_valueName
-        Text item=MoWaS_geocode_value
+sitemap MoWaS label="MoWaS" {
+	Frame label="MOWAS"visibility=[MoWaS_alarm==ON] {
+			Text item=MoWaS_identifier
+			Text item=MoWaS_sender
+			Text item=MoWaS_sent
+			Text item=MoWaS_msgType
+			Text item=MoWaS_scope
+			Text item=MoWaS_code
+			Text item=MoWaS_language
+			Text item=MoWaS_category
+			Text item=MoWaS_event
+			Text item=MoWaS_responseType
+			Text item=MoWaS_urgency
+			Text item=MoWaS_severity
+			Text item=MoWaS_certainty
+			Text item=MoWaS_headline
+			Text item=MoWaS_description
+			Text item=MoWaS_instruction
+			Text item=MoWaS_web
+			Text item=MoWaS_contact
+			Text icon="calendar" item=MoWaS_effective
+			Text icon="calendar" item=MoWaS_expires
+			Text item=MoWaS_parameter_0
+			Text item=MoWaS_parameter_1
+			Text item=MoWaS_areaDesc
+			Webview icon="none" url="../static/map/map.html?item=MoWaS_polygon" height=5
+			Text item=MoWaS_geocode_valueName
+			Text item=MoWaS_geocode_value
+	}
+	Frame label="BIWAPP"visibility=[BiWaPP_alarm==ON] {
+			Text item=BiWaPP_identifier
+			Text item=BiWaPP_sender
+			Text item=BiWaPP_sent
+			Text item=BiWaPP_msgType
+			Text item=BiWaPP_scope
+			Text item=BiWaPP_code
+			Text item=BiWaPP_language
+			Text item=BiWaPP_category
+			Text item=BiWaPP_event
+			Text item=BiWaPP_responseType
+			Text item=BiWaPP_urgency
+			Text item=BiWaPP_severity
+			Text item=BiWaPP_certainty
+			Text item=BiWaPP_headline
+			Text item=BiWaPP_description
+			Text item=BiWaPP_instruction
+			Text item=BiWaPP_web
+			Text item=BiWaPP_contact
+			Text icon="calendar" item=BiWaPP_effective
+			Text icon="calendar" item=BiWaPP_expires
+			Text item=BiWaPP_parameter_0
+			Text item=BiWaPP_parameter_1
+			Text item=BiWaPP_areaDesc
+			Webview icon="none" url="../static/map/map.html?item=BiWaPP_polygon" height=5
+			Text item=BiWaPP_geocode_valueName
+			Text item=BiWaPP_geocode_value
+	}
+	Frame label="DWD" visibility=[DWD_alarm==ON] {
+			Text item=DWD_identifier
+			Text item=DWD_sender
+			Text icon="calendar" item=DWD_sent
+			Text item=DWD_msgType
+			Text item=DWD_scope
+			Text item=DWD_code
+			Text item=DWD_language
+			Text item=DWD_category
+			Text item=DWD_event
+			Text item=DWD_responseType
+			Text item=DWD_urgency
+			Text item=DWD_severity
+			Text item=DWD_certainty
+			Text item=DWD_headline
+			Text item=DWD_description
+			Text item=DWD_instruction
+			Text item=DWD_web
+			Text item=DWD_contact
+			Text icon="calendar" item=DWD_effective
+			Text icon="calendar" item=DWD_expires
+			Text item=DWD_parameter_0
+			Text item=DWD_parameter_1
+			Text item=DWD_areaDesc
+			Webview icon="none" url="../static/map/map.html?item=DWD_polygon" height=5
+			Text item=DWD_geocode_valueName
+			Text item=DWD_geocode_value
+	}
+	Frame label="LHP"visibility=[LHP_alarm==ON] {
+			Text item=LHP_identifier
+			Text item=LHP_sender
+			Text item=LHP_sent
+			Text item=LHP_msgType
+			Text item=LHP_scope
+			Text item=LHP_code
+			Text item=LHP_language
+			Text item=LHP_category
+			Text item=LHP_event
+			Text item=LHP_responseType
+			Text item=LHP_urgency
+			Text item=LHP_severity
+			Text item=LHP_certainty
+			Text item=LHP_headline
+			Text item=LHP_description
+			Text item=LHP_instruction
+			Text item=LHP_web
+			Text item=LHP_contact
+			Text icon="calendar" item=LHP_effective
+			Text icon="calendar" item=LHP_expires
+			Text item=LHP_parameter_0
+			Text item=LHP_parameter_1
+			Text item=LHP_areaDesc
+			Webview icon="none" url="../static/map/map.html?item=LHP_polygon" height=5
+			Text item=LHP_geocode_valueName
+			Text item=LHP_geocode_value
+	}
+	Frame label="KatWarn"visibility=[KatWarn_alarm==ON] {
+			Text item=KatWarn_identifier
+			Text item=KatWarn_sender
+			Text item=KatWarn_sent
+			Text item=KatWarn_msgType
+			Text item=KatWarn_scope
+			Text item=KatWarn_code
+			Text item=KatWarn_language
+			Text item=KatWarn_category
+			Text item=KatWarn_event
+			Text item=KatWarn_responseType
+			Text item=KatWarn_urgency
+			Text item=KatWarn_severity
+			Text item=KatWarn_certainty
+			Text item=KatWarn_headline
+			Text item=KatWarn_description
+			Text item=KatWarn_instruction
+			Text item=KatWarn_web
+			Text item=KatWarn_contact
+			Text icon="calendar" item=KatWarn_effective
+			Text icon="calendar" item=KatWarn_expires
+			Text item=KatWarn_parameter_0
+			Text item=KatWarn_parameter_1
+			Text item=KatWarn_areaDesc
+			Webview icon="none" url="../static/map/map.html?item=KatWarn_polygon" height=5
+			Text item=KatWarn_geocode_valueName
+			Text item=KatWarn_geocode_value
+	}
 }
-Frame label="BIWAPP"visibility=[BiWaPP_alarm==ON] {
-        Text item=BiWaPP_identifier
-        Text item=BiWaPP_sender
-        Text item=BiWaPP_sent
-        Text item=BiWaPP_msgType
-        Text item=BiWaPP_scope
-        Text item=BiWaPP_code
-        Text item=BiWaPP_language
-        Text item=BiWaPP_category
-        Text item=BiWaPP_event
-        Text item=BiWaPP_responseType
-        Text item=BiWaPP_urgency
-        Text item=BiWaPP_severity
-        Text item=BiWaPP_certainty
-        Text item=BiWaPP_headline
-        Text item=BiWaPP_description
-        Text item=BiWaPP_instruction
-        Text item=BiWaPP_web
-        Text item=BiWaPP_contact
-        Text item=BiWaPP_sender_langname
-        Text item=BiWaPP_sender_signature
-        Text item=BiWaPP_areaDesc
-		Webview url="../static/map/map.html?item=BiWaPP_polygon" height=5
-		Text item=BiWaPP_geocode_valueName
-        Text item=BiWaPP_geocode_value
-
-}
-Frame label="DWD"visibility=[DWD_alarm==ON] {
-        Text item=DWD_identifier
-        Text item=DWD_sender
-        Text item=DWD_sent
-        Text item=DWD_msgType
-        Text item=DWD_scope
-        Text item=DWD_code
-        Text item=DWD_language
-        Text item=DWD_category
-        Text item=DWD_event
-        Text item=DWD_responseType
-        Text item=DWD_urgency
-        Text item=DWD_severity
-        Text item=DWD_certainty
-        Text item=DWD_headline
-        Text item=DWD_description
-        Text item=DWD_instruction
-        Text item=DWD_web
-        Text item=DWD_contact
-        Text item=DWD_sender_langname
-        Text item=DWD_sender_signature
-        Text item=DWD_areaDesc
-		Webview url="../static/map/map.html?item=DWD_polygon" height=5
-		Text item=DWD_geocode_valueName
-        Text item=DWD_geocode_value
-
-}
-Frame label="LHP"visibility=[LHP_alarm==ON] {
-        Text item=LHP_identifier
-        Text item=LHP_sender
-        Text item=LHP_sent
-        Text item=LHP_msgType
-        Text item=LHP_scope
-        Text item=LHP_code
-        Text item=LHP_language
-        Text item=LHP_category
-        Text item=LHP_event
-        Text item=LHP_responseType
-        Text item=LHP_urgency
-        Text item=LHP_severity
-        Text item=LHP_certainty
-        Text item=LHP_headline
-        Text item=LHP_description
-        Text item=LHP_instruction
-        Text item=LHP_web
-        Text item=LHP_contact
-        Text item=LHP_sender_langname
-        Text item=LHP_sender_signature
-        Text item=LHP_areaDesc
-		Webview url="../static/map/map.html?item=LHP_polygon" height=5
-		Text item=LHP_geocode_valueName
-        Text item=LHP_geocode_value
-
-}
-Frame label="KatWarn"visibility=[KatWarn_alarm==ON] {
-        Text item=KatWarn_identifier
-        Text item=KatWarn_sender
-        Text item=KatWarn_sent
-        Text item=KatWarn_msgType
-        Text item=KatWarn_scope
-        Text item=KatWarn_code
-        Text item=KatWarn_language
-        Text item=KatWarn_category
-        Text item=KatWarn_event
-        Text item=KatWarn_responseType
-        Text item=KatWarn_urgency
-        Text item=KatWarn_severity
-        Text item=KatWarn_certainty
-        Text item=KatWarn_headline
-        Text item=KatWarn_description
-        Text item=KatWarn_instruction
-        Text item=KatWarn_web
-        Text item=KatWarn_contact
-        Text item=KatWarn_sender_langname
-        Text item=KatWarn_sender_signature
-        Text item=KatWarn_areaDesc
-		Webview url="../static/map/map.html?item=KatWarn_polygon" height=5
-		Text item=KatWarn_geocode_valueName
-        Text item=KatWarn_geocode_value
-
-}
-}
- 
